@@ -1,10 +1,11 @@
 'use client'
 
-import Image from 'next/image'
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 
 import { useFetchVideos } from '@/hooks/use-fetch-videos'
 import { Notification } from '@/components/notification'
+import { Video } from '@/components/video'
+import { useSpeed } from '@/hooks/use-speed'
 
 const Videos = ({ videos: initVideos }: { videos: Video[] }) => {
   const loadingRef = useRef(false)
@@ -17,6 +18,10 @@ const Videos = ({ videos: initVideos }: { videos: Video[] }) => {
     isFetchingNextPage,
     status,
   } = useFetchVideos(initVideos, loadingRef)
+  const [playingId, setPlayingId] = useState<string | null>(null)
+  const { loading, results } = useSpeed()
+  const speedMbps = results.speedMbps
+  const speedQuality = loading ? 'LOADING' : speedMbps > 50 ? 'FAST' : 'SLOW'
 
   useEffect(() => {
     let prevScrollY = 0
@@ -54,28 +59,28 @@ const Videos = ({ videos: initVideos }: { videos: Video[] }) => {
     }
   }, [])
 
+  const handlePlay = (video: Video) => {
+    setPlayingId(playingId === video.id ? null : video.id)
+  }
+
   return (
     <section className='py-10' ref={refWrapper}>
       <div className='container mx-auto flex flex-col gap-10 px-4'>
-        <h2 className='text-center text-4xl font-bold'>Videos</h2>
+        <div className='text-center'>
+          <h2 className='text-center text-4xl font-bold'>Videos</h2>
+          <h3 className='text-center text-3xl'>SpeedTest - {speedMbps} Mbps</h3>
+        </div>
         <div className='grid grid-cols-4 gap-10'>
           {data.pages.map((group, i) => (
             <React.Fragment key={i}>
               {group.data.map((video) => (
-                <div
+                <Video
                   key={video.id}
-                  className='aspect-square rounded-2xl bg-white p-4 shadow-md'
-                  data-item
-                >
-                  <Image
-                    width={200}
-                    height={200}
-                    src={video.poster.url}
-                    className='h-full w-full object-cover'
-                    alt=''
-                  />
-                  {/* <video src={video.media.urls['mp4:480p']} controls></video> */}
-                </div>
+                  video={video}
+                  playing={playingId === video.id}
+                  onPlay={handlePlay}
+                  speedQuality={speedQuality}
+                />
               ))}
             </React.Fragment>
           ))}
