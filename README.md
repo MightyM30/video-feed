@@ -1,36 +1,33 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+## How to run project
 
-## Getting Started
+First, install dependencies:
 
-First, run the development server:
+```bash
+npm install
+```
+
+Second, run the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Design decisions
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+# Common
 
-## Learn More
+Using Next.js API as a proxy to avoid using a auth token on the client.
 
-To learn more about Next.js, take a look at the following resources:
+# Preloading Videos
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Video download starts when the user clicks on the video.
+Depending on the Internet speed, the user downloads videos of different quality. If the speed is more than 100 Mbit/s, 1080p quality is downloaded, otherwise 720p.
+Additionally, the full video is downloaded in parallel so that the video can be watched without buffering. Once the full video is downloaded, it will be replaced without any noticeable delays or interruptions. When the user moves to another video, the download stops.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+# Continuous Loading
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Videos split into pages of 8 pieces.
+The first page loads instantly.
+New pages are loaded dynamically as the user scrolls to the latest cards.
