@@ -21,7 +21,7 @@ const Videos = ({ videos: initVideos }: { videos: Video[] }) => {
   const [playingId, setPlayingId] = useState<string | null>(null)
   const { loading, results } = useSpeed()
   const speedMbps = results.speedMbps
-  const speedQuality = loading ? 'LOADING' : speedMbps > 50 ? 'FAST' : 'SLOW'
+  const speedQuality = loading ? 'LOADING' : speedMbps > 100 ? 'FAST' : 'SLOW'
 
   useEffect(() => {
     let prevScrollY = 0
