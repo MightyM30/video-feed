@@ -31,3 +31,7 @@ Additionally, the full video is downloaded in parallel so that the video can be 
 Videos split into pages of 8 pieces.
 The first page loads instantly.
 New pages are loaded dynamically as the user scrolls to the latest cards.
+
+# Error Handling
+
+Where a full video fails to load uses retry mechanism.
