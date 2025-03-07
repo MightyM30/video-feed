@@ -32,14 +32,16 @@ const Videos = ({ videos: initVideos }: { videos: Video[] }) => {
       }
 
       const scrollY = window.scrollY
-      const bottom = prevScrollY > scrollY
-      if (bottom) {
+      const scrollToTop = prevScrollY > scrollY
+
+      if (scrollToTop) {
         return
       }
 
-      const bottomY = document.body.offsetHeight - window.innerHeight
+      const currentY = scrollY + window.innerHeight + height
+      const bottomY = document.body.offsetHeight
 
-      if (scrollY + height > bottomY) {
+      if (currentY > bottomY) {
         loadingRef.current = true
         fetchNextPage()
       }
