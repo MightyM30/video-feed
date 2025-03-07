@@ -53,22 +53,26 @@ const Video = ({
     let loading = true
 
     console.log('start preloading full video')
+
+    const setResult = (video: string) => {
+      console.log('loaded ', video)
+      loading = false
+      const player = playerRef.current
+
+      if (player === null) {
+        return
+      }
+
+      const time = player.getCurrentTime()
+      setVideoSourceBlob(video)
+      setTimeout(() => {
+        player.seekTo(time)
+      }, 1)
+    }
+
     preloadVideo(video720, signal)
-      .then((video) => {
-        console.log('loaded ', video)
-        loading = false
-        const player = playerRef.current
-
-        if (player === null) {
-          return
-        }
-
-        const time = player.getCurrentTime()
-        setVideoSourceBlob(video)
-        setTimeout(() => {
-          player.seekTo(time)
-        }, 1)
-      })
+      .then(setResult)
+      .catch(() => preloadVideo(video720, signal).then(setResult))
       .catch(console.log)
 
     return () => {
