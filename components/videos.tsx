@@ -25,11 +25,6 @@ const Videos = ({ videos: initVideos }: { videos: Video[] }) => {
 
   useEffect(() => {
     let prevScrollY = 0
-    const wrapperDom = refWrapper.current!
-    const item =
-      wrapperDom.querySelector('[data-item]') ?? document.createElement('div')
-
-    const height = item.getBoundingClientRect().height || 200
 
     const scroll = () => {
       if (loadingRef.current) {
@@ -43,7 +38,7 @@ const Videos = ({ videos: initVideos }: { videos: Video[] }) => {
         return
       }
 
-      const currentY = scrollY + window.innerHeight + height
+      const currentY = scrollY + window.innerHeight + window.innerHeight / 2
       const bottomY = document.body.offsetHeight
 
       if (currentY > bottomY) {
