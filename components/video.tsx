@@ -6,7 +6,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import ReactPlayerT from 'react-player'
 import { FaPlay } from 'react-icons/fa'
 
-import { cn, preloadVideo } from '@/lib/utils'
+import { cn } from '@/lib/utils'
 
 const ReactPlayer = dynamic(() => import('react-player/lazy'), { ssr: false })
 
@@ -25,71 +25,30 @@ const Video = ({
   const wrapperRef = useRef<HTMLDivElement>(null)
   const [showVideo, setShowVideo] = useState(false)
   const [videoSource, setVideoSource] = useState<string>('')
-  const [videoSourceBlob, setVideoSourceBlob] = useState('')
 
   const video720 = video.media.urls['webm:720p']
   const video1080 = video.media.urls['webm:1080p']
 
   const handlePlayPause = () => {
-    setShowVideo(true)
     onPlay(video)
+    setShowVideo(true)
   }
 
   useEffect(() => {
-    if (showVideo === false) {
-      return
+    if (!playing) {
+      setShowVideo(false)
     }
-
-    if (videoSourceBlob) {
-      return
-    }
-
-    if (playing === false) {
-      return
-    }
-
-    const controller = new AbortController()
-    const signal = controller.signal
-    let loading = true
-
-    console.log('start preloading full video')
-
-    const setResult = (video: string) => {
-      console.log('loaded ', video)
-      loading = false
-      const player = playerRef.current
-
-      if (player === null) {
-        return
-      }
-
-      const time = player.getCurrentTime()
-      setVideoSourceBlob(video)
-      setTimeout(() => {
-        player.seekTo(time)
-      }, 1)
-    }
-
-    preloadVideo(video720, signal)
-      .then(setResult)
-      .catch(() => preloadVideo(video720, signal).then(setResult))
-      .catch(console.log)
-
-    return () => {
-      if (loading) {
-        controller.abort()
-      }
-    }
-  }, [showVideo, playing])
+  }, [playing])
 
   useEffect(() => {
-    if (speedQuality === 'LOADING') {
-      return
-    }
+    if (speedQuality === 'LOADING') return
 
-    const videoSource = speedQuality === 'FAST' ? video1080 : video720
-    setVideoSource(videoSource)
+    setVideoSource(speedQuality === 'FAST' ? video1080 : video720)
   }, [speedQuality])
+
+  const handleVideoEnd = () => {
+    setShowVideo(false)
+  }
 
   return (
     <div
@@ -106,27 +65,25 @@ const Video = ({
           className='h-full w-full object-cover'
           alt=''
         />
-        {showVideo && (
-          <div
-            className={cn(
-              'absolute inset-0 flex items-center justify-center text-white',
-            )}
-          >
+        {showVideo && playing && (
+          <div className='absolute inset-0 flex items-center justify-center text-white'>
             <ReactPlayer
               ref={playerRef}
-              url={videoSourceBlob || videoSource}
+              url={videoSource}
               width={'100%'}
               height='100%'
               playing={playing}
               controls={true}
+              onEnded={handleVideoEnd}
             />
           </div>
         )}
+
         {!showVideo && (
           <button
             className={cn(
               'bg-primary/40 hover:text-primary hover:bg-primary/20 absolute inset-0 flex cursor-pointer items-center justify-center text-4xl text-white transition-all hover:scale-150',
-              playing && 'opacity-0',
+              playing && showVideo && 'opacity-0'
             )}
             onClick={handlePlayPause}
           >

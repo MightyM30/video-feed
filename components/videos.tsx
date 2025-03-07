@@ -1,7 +1,6 @@
 'use client'
 
 import React, { useEffect, useRef, useState } from 'react'
-
 import { useFetchVideos } from '@/hooks/use-fetch-videos'
 import { Notification } from '@/components/notification'
 import { Video } from '@/components/video'
@@ -18,6 +17,7 @@ const Videos = ({ videos: initVideos }: { videos: Video[] }) => {
     isFetchingNextPage,
     status,
   } = useFetchVideos(initVideos, loadingRef)
+  
   const [playingId, setPlayingId] = useState<string | null>(null)
   const { loading, results } = useSpeed()
   const speedMbps = results.speedMbps
@@ -55,7 +55,7 @@ const Videos = ({ videos: initVideos }: { videos: Video[] }) => {
   }, [])
 
   const handlePlay = (video: Video) => {
-    setPlayingId(playingId === video.id ? null : video.id)
+    setPlayingId((prevId) => (prevId === video.id ? null : video.id))
   }
 
   return (
